@@ -1,4 +1,4 @@
-package me.iscle.adifunofficial
+package me.iscle.adifunofficial.elcano
 
 import android.content.Context
 import android.provider.Settings
@@ -7,8 +7,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import me.iscle.adifunofficial.elcano.circulation.network.CirculationService
+import me.iscle.adifunofficial.elcano.stations.network.StationsService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -40,5 +44,31 @@ object NetworkModule {
         return builder
             .addInterceptor(ElcanoAuthInterceptor(androidId))
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideStationsService(
+        @Named("Authenticated") okHttpClient: OkHttpClient
+    ): StationsService {
+        return Retrofit.Builder()
+            .baseUrl("https://estaciones.api.adif.es")
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
+            .create(StationsService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCirculationService(
+        @Named("Authenticated") okHttpClient: OkHttpClient
+    ): CirculationService {
+        return Retrofit.Builder()
+            .baseUrl("https://circulacion.api.adif.es")
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
+            .create(CirculationService::class.java)
     }
 }

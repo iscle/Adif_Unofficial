@@ -1,4 +1,4 @@
-package me.iscle.adifunofficial
+package me.iscle.adifunofficial.elcano
 
 import okhttp3.Interceptor
 import okhttp3.Response
