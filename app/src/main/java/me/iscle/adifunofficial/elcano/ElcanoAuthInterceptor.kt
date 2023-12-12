@@ -121,13 +121,13 @@ class ElcanoAuthInterceptor(
                 "$elcanoDateSimple/" +
                 "$ELCANO_CLIENT/" +
                 "$androidId/" +
-                "elcano_request," +
+                "$ELCANO_REQUEST," +
                 "SignedHeaders=" +
-                "content-type;" +
-                "x-elcano-host;" +
-                "x-elcano-client;" +
-                "x-elcano-date;" +
-                "x-elcano-userid," +
+                "${HEADER_CONTENT_TYPE.lowercase()};" +
+                "${HEADER_X_ELCANO_HOST.lowercase()};" +
+                "${HEADER_X_ELCANO_CLIENT.lowercase()};" +
+                "${HEADER_X_ELCANO_DATE.lowercase()};" +
+                "${HEADER_X_ELCANO_USERID.lowercase()}," +
                 "Signature=" +
                 signature
     }
