@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class BannerDTO(
-    val bannerDescription: String,
-    val bannerTitle: String,
-    val bannerURI: String,
+    val bannerDescription: String?,
+    val bannerTitle: String?,
+    val bannerURI: String?,
 )

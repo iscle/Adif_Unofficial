@@ -4,5 +4,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class RequestedStationInfoListDTO(
-    val stationInfo: StationInfoDTO,
+    val stationInfo: StationInfoDTO?,
 )

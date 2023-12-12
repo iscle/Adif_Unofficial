@@ -4,30 +4,30 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class PassthroughStepDTO(
-    val announceable: Boolean,
-    val arrivalPassthroughStepSides: DeparturePassthroughStepSidesDTO,
-    val departurePassthroughStepSides: DeparturePassthroughStepSidesDTO,
-    val stationCode: String,
-    val stopType: String,
+    val announceable: Boolean?,
+    val arrivalPassthroughStepSides: DeparturePassthroughStepSidesDTO?,
+    val departurePassthroughStepSides: DeparturePassthroughStepSidesDTO?,
+    val stationCode: String?,
+    val stopType: String?,
 ) {
     data class DeparturePassthroughStepSidesDTO(
-        val announceState: String,
-        val circulationState: String,
-        val ctcPlatform: String,
-        val forecastedOrAuditedDelay: Int,
-        val observation: String,
-        val operatorPlatform: String,
-        val plannedPlatform: String,
-        val plannedTime: Long,
-        val resultantPlatform: String,
-        val sitraPlatform: String,
-        val technicalCirculationKey: TechnicalCirculationKeyDTO,
-        val timeType: String,
-        val visualEffects: VisualEffectsDTO,
+        val announceState: String?,
+        val circulationState: String?,
+        val ctcPlatform: String?,
+        val forecastedOrAuditedDelay: Int?,
+        val observation: String?,
+        val operatorPlatform: String?,
+        val plannedPlatform: String?,
+        val plannedTime: Long?,
+        val resultantPlatform: String?,
+        val sitraPlatform: String?,
+        val technicalCirculationKey: TechnicalCirculationKeyDTO?,
+        val timeType: String?,
+        val visualEffects: VisualEffectsDTO?,
     )
 
     data class TechnicalCirculationKeyDTO(
-        val technicalLaunchingDate: Long,
-        val technicalNumber: String,
+        val technicalLaunchingDate: Long?,
+        val technicalNumber: String?,
     )
 }

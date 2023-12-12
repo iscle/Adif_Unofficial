@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 data class StationInfoDTO(
     val accessible: AccessibleDTO?,
     val akaList: List<String>,
-    val commercialZoneType: String,
+    val commercialZoneType: String?,
     val commuterNetwork: String?,
     val description: String?,
     val lines: List<String>,

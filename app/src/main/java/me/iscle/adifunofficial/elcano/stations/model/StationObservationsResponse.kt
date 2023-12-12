@@ -4,5 +4,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class StationObservationsResponse(
-    val observations: List<StationObservationsDTO>,
+    val observations: List<StationObservationsDTO>?,
 )

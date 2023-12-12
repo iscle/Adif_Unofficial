@@ -4,7 +4,6 @@ import me.iscle.adifunofficial.elcano.circulation.model.CommercialPathRouteInfoR
 import me.iscle.adifunofficial.elcano.circulation.model.OneOrSeveralPathsRequest
 import me.iscle.adifunofficial.elcano.circulation.model.TrafficCirculationPathRequest
 import retrofit2.http.Body
-import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 

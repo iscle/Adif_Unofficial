@@ -4,6 +4,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CorrespondenceDTO(
-    val logo: String,
-    val name: String,
+    val logo: String?,
+    val name: String?,
 )

@@ -4,6 +4,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CommercialPathStepSideInfoDTO(
-    val commercialPathInfo: CommercialPathInfoDTO,
-    val passthroughStep: PassthroughStepDTO,
+    val commercialPathInfo: CommercialPathInfoDTO?,
+    val passthroughStep: PassthroughStepDTO?,
 )

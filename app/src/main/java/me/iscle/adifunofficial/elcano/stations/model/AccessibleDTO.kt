@@ -4,6 +4,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class AccessibleDTO(
-    val accessible: Boolean,
+    val accessible: Boolean?,
     val description: String?,
 )

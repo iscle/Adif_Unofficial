@@ -4,5 +4,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CommercialRouteInfoResponse(
-    val commercialPaths: List<CommercialRouteInfoDTO>,
+    val commercialPaths: List<CommercialRouteInfoDTO>?,
 )

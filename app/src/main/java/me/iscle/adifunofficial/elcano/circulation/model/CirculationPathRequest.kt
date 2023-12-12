@@ -11,6 +11,6 @@ interface CirculationPathRequest {
 
     @JsonClass(generateAdapter = true)
     data class PageInfoDTO(
-        val pageNumber: Int,
+        val pageNumber: Int?,
     )
 }

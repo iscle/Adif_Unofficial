@@ -4,6 +4,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class OpeningHoursDTO(
-    val longText: String,
-    val shortText: String,
+    val longText: String?,
+    val shortText: String?,
 )
