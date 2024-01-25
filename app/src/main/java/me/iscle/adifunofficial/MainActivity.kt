@@ -1,63 +1,37 @@
 package me.iscle.adifunofficial
 
 import android.os.Bundle
-import android.webkit.WebView
+import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import me.iscle.adifunofficial.elcano.stations.network.StationsService
 import me.iscle.adifunofficial.ui.theme.AdifUnofficialTheme
+import javax.inject.Inject
+
+private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject protected lateinit var stationsService: StationsService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AdifUnofficialTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    AdifWebView()
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun AdifWebView() {
-        var webView = remember<WebView?> { null }
-
-        BackHandler {
-            val webView = webView
-            if (webView?.canGoBack() == true) {
-                webView.goBack()
-            } else {
-                finish()
+                MainUi()
             }
         }
 
-        AndroidView(
-            factory = {
-                WebView(it).apply {
-                    webView = this
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
-                    webViewClient = AdifWebViewClient()
-                    loadUrl("https://elcanoweb.adif.es")
-                }
+        lifecycleScope.launch(Dispatchers.IO) {
+            val response = stationsService.stations("0")
+            Log.d(TAG, "onCreate: $response")
+            response.requestedStationInfoList?.mapNotNull { it.stationInfo }?.sortedBy { it.longName }?.forEach {
+                Log.d(TAG, "onCreate: ${it.shortName}, ${it.longName}")
             }
-        )
+        }
     }
 }
