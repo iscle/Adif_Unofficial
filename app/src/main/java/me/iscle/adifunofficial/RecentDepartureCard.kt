@@ -1,5 +1,6 @@
 package me.iscle.adifunofficial
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,9 +20,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RecentDepartureCard(
+    modifier: Modifier = Modifier,
     stationName: String,
+    onClick: () -> Unit,
 ) {
-    OutlinedCard {
+    OutlinedCard(
+        modifier = modifier.clickable(onClick = onClick),
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,5 +56,8 @@ fun RecentDepartureCard(
 @Preview
 @Composable
 fun RecentDepartureCardPreview() {
-    RecentDepartureCard("Madrid")
+    RecentDepartureCard(
+        stationName = "Madrid",
+        onClick = {},
+    )
 }

@@ -125,20 +125,27 @@ fun MainUi() {
                             style = MaterialTheme.typography.titleLarge,
                         )
                         
-                        RecentArrivalCard(stationName = "Madrid")
+                        RecentArrivalCard(
+                            stationName = "Madrid",
+                            onClick = {},
+                        )
 
-                        RecentDepartureCard(stationName = "Madrid")
+                        RecentDepartureCard(
+                            stationName = "Madrid",
+                            onClick = {},
+                        )
 
                         RecentBetweenStationsCard(
                             origin = "Madrid",
                             destination = "Barcelona",
+                            onClick = {},
                         )
 
                         RecentBetweenStationsCard(
                             origin = "Barcelona",
                             destination = "Granollers",
+                            onClick = {},
                         )
-
                     }
                 }
             }

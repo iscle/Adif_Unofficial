@@ -1,5 +1,6 @@
 package me.iscle.adifunofficial
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,10 +20,14 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RecentBetweenStationsCard(
+    modifier: Modifier = Modifier,
     origin: String,
     destination: String,
+    onClick: () -> Unit,
 ) {
-    OutlinedCard {
+    OutlinedCard(
+        modifier = modifier.clickable(onClick = onClick),
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -53,5 +58,9 @@ fun RecentBetweenStationsCard(
 @Preview
 @Composable
 fun RecentBetweenStationsCardPreview() {
-    RecentBetweenStationsCard("Madrid", "Barcelona")
+    RecentBetweenStationsCard(
+        origin = "Madrid",
+        destination = "Barcelona",
+        onClick = {},
+    )
 }

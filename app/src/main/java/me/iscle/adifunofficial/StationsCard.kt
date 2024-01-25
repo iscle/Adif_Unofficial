@@ -27,6 +27,8 @@ fun StationsCard(
     modifier: Modifier = Modifier,
     onShowSnackbar: (String) -> Unit,
 ) {
+    var showSearch by remember { mutableStateOf(false) }
+
     ElevatedCard(
         modifier = modifier,
     ) {
@@ -39,17 +41,17 @@ fun StationsCard(
                 style = MaterialTheme.typography.titleLarge,
             )
 
-            var origin by remember { mutableStateOf("") }
+            var station by remember { mutableStateOf("") }
             val sourceInteractionSource = remember { MutableInteractionSource() }
             LaunchedEffect(sourceInteractionSource) {
                 sourceInteractionSource.interactions.collect {
                     if (it is PressInteraction.Release) {
-                        origin = "Origin tapped!"
+                        showSearch = true
                     }
                 }
             }
             OutlinedTextField(
-                value = origin,
+                value = station,
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
@@ -63,7 +65,7 @@ fun StationsCard(
             ) {
                 Button(
                     onClick = {
-                              if (origin.isEmpty()) {
+                              if (station.isEmpty()) {
                                   onShowSnackbar("Selecciona una estación")
                               } else {
                                   // TODO: Navigate to departures
@@ -76,7 +78,7 @@ fun StationsCard(
 
                 Button(
                     onClick = {
-                                if (origin.isEmpty()) {
+                                if (station.isEmpty()) {
                                     onShowSnackbar("Selecciona una estación")
                                 } else {
                                     // TODO: Navigate to arrivals
@@ -88,6 +90,14 @@ fun StationsCard(
                 }
             }
         }
+    }
+
+    if (showSearch) {
+        SearchModalBottomSheet(
+            onDismissRequest = {
+                showSearch = false
+            }
+        )
     }
 }
 
