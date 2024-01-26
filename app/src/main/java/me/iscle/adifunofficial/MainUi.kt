@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationCity
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -20,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +43,7 @@ private enum class NavigationBarItems(
     FAVORITES(Icons.Filled.Favorite, "Favoritos"),
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainUi() {
     val scope = rememberCoroutineScope()
@@ -49,13 +52,13 @@ fun MainUi() {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-//        topBar = {
-//                 TopAppBar(
-//                     title = {
-//                         Text(text = selectedNavigationBarItem.label)
-//                     }
-//                 )
-//        },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = selectedNavigationBarItem.label)
+                }
+            )
+        },
         bottomBar = {
             NavigationBar {
                 NavigationBarItems.entries.forEach {

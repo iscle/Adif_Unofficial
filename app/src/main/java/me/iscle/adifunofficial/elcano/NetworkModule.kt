@@ -8,7 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.iscle.adifunofficial.elcano.circulation.network.CirculationService
-import me.iscle.adifunofficial.elcano.stations.network.StationsService
+import me.iscle.adifunofficial.elcano.stations.network.StationService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -50,13 +50,13 @@ object NetworkModule {
     @Singleton
     fun provideStationsService(
         @Named("Authenticated") okHttpClient: OkHttpClient
-    ): StationsService {
+    ): StationService {
         return Retrofit.Builder()
             .baseUrl("https://estaciones.api.adif.es")
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
-            .create(StationsService::class.java)
+            .create(StationService::class.java)
     }
 
     @Provides

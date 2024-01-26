@@ -3,8 +3,10 @@ package me.iscle.adifunofficial
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import me.iscle.adifunofficial.elcano.stations.network.StationsService
+import kotlinx.coroutines.launch
+import me.iscle.adifunofficial.station.StationRepository
 import me.iscle.adifunofficial.ui.theme.AdifUnofficialTheme
 import javax.inject.Inject
 
@@ -12,7 +14,7 @@ private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject protected lateinit var stationsService: StationsService
+    @Inject protected lateinit var stationRepository: StationRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,12 +24,8 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-//        lifecycleScope.launch(Dispatchers.IO) {
-//            val response = stationsService.stations("0")
-//            Log.d(TAG, "onCreate: $response")
-//            response.requestedStationInfoList?.mapNotNull { it.stationInfo }?.sortedBy { it.longName }?.forEach {
-//                Log.d(TAG, "onCreate: ${it.shortName}, ${it.longName}")
-//            }
-//        }
+        lifecycleScope.launch {
+            stationRepository.updateStations()
+        }
     }
 }
