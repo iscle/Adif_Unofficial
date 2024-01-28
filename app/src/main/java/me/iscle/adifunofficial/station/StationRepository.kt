@@ -79,30 +79,5 @@ class StationRepository @Inject constructor(
 
     suspend fun search(
         searchString: String,
-    ): List<StationEntity> {
-        return withContext(Dispatchers.IO) {
-            val parts = AdifNormalizer.normalize(searchString).split("\\s+".toRegex())
-
-            var queryString = "SELECT * FROM Station WHERE ("
-            parts.forEachIndexed { index, s ->
-                queryString += "normalizedLongName LIKE '%' || ? || '%'"
-                if (index != parts.size - 1) {
-                    queryString += " AND "
-                }
-            }
-            queryString += ") OR ("
-            parts.forEachIndexed { index, s ->
-                queryString += "normalizedShortName LIKE '%' || ? || '%'"
-                if (index != parts.size - 1) {
-                    queryString += " AND "
-                }
-            }
-            queryString += ") OR (code LIKE '%' || ? || '%')"
-
-
-            val finalArgs = parts + parts + queryString
-            val query = SimpleSQLiteQuery(queryString, finalArgs.toTypedArray())
-            stationDao.search(query)
-        }
-    }
+    ) = stationDao.searchStations(searchString)
 }

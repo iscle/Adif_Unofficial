@@ -6,5 +6,11 @@ enum class TrafficType {
     OTHERS,
     TRAVELERS,
     GOODS,
-    ALL,
+    ALL;
+
+    companion object {
+        fun fromString(string: String): TrafficType? {
+            return entries.firstOrNull { it.name == string }
+        }
+    }
 }

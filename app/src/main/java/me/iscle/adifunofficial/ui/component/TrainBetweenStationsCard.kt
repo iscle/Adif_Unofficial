@@ -20,13 +20,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import me.iscle.adifunofficial.station.model.Station
 import me.iscle.adifunofficial.ui.SearchModalBottomSheet
 
 @Composable
 fun TrainBetweenStationsCard(
     modifier: Modifier = Modifier,
     onShowSnackbar: (text: String) -> Unit,
-    onSearchTrains: (origin: StationEntity, destination: StationEntity) -> Unit,
+    onSearchTrains: (origin: Station, destination: Station) -> Unit,
 ) {
     ElevatedCard(
         modifier = modifier,
@@ -41,13 +42,13 @@ fun TrainBetweenStationsCard(
             )
 
             var showOriginStationSearch by remember { mutableStateOf(false) }
-            var originStationEntity by remember { mutableStateOf<StationEntity?>(null) }
+            var originStation by remember { mutableStateOf<Station?>(null) }
 
             if (showOriginStationSearch) {
                 SearchModalBottomSheet(
                     onDismissed = { showOriginStationSearch = false },
-                    onStationSelected = { originStationEntity = it },
-                    defaultStationEntity = originStationEntity,
+                    onStationSelected = { originStation = it },
+                    defaultStation = originStation,
                 )
             }
 
@@ -60,7 +61,7 @@ fun TrainBetweenStationsCard(
                 }
             }
             OutlinedTextField(
-                value = originStationEntity?.longName ?: "",
+                value = originStation?.longName ?: "",
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
@@ -69,13 +70,13 @@ fun TrainBetweenStationsCard(
             )
 
             var showDestinationStationSearch by remember { mutableStateOf(false) }
-            var destinationStationEntity by remember { mutableStateOf<StationEntity?>(null) }
+            var destinationStation by remember { mutableStateOf<Station?>(null) }
 
             if (showDestinationStationSearch) {
                 SearchModalBottomSheet(
                     onDismissed = { showDestinationStationSearch = false },
-                    onStationSelected = { destinationStationEntity = it },
-                    defaultStationEntity = destinationStationEntity,
+                    onStationSelected = { destinationStation = it },
+                    defaultStation = destinationStation,
                 )
             }
 
@@ -88,7 +89,7 @@ fun TrainBetweenStationsCard(
                 }
             }
             OutlinedTextField(
-                value = destinationStationEntity?.longName ?: "",
+                value = destinationStation?.longName ?: "",
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
@@ -98,8 +99,8 @@ fun TrainBetweenStationsCard(
 
             Button(
                 onClick = {
-                    val selectedOriginStation = originStationEntity
-                    val selectedDestinationStation = destinationStationEntity
+                    val selectedOriginStation = originStation
+                    val selectedDestinationStation = destinationStation
                     if (selectedOriginStation == null && selectedDestinationStation == null) {
                         onShowSnackbar("Selecciona una estación de origen y destino")
                     } else if (selectedOriginStation == null) {

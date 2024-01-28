@@ -21,14 +21,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import me.iscle.adifunofficial.station.model.Station
 import me.iscle.adifunofficial.ui.SearchModalBottomSheet
 
 @Composable
 fun StationsCard(
     modifier: Modifier = Modifier,
     onShowSnackbar: (text: String) -> Unit,
-    onViewDepartures: (stationEntity: StationEntity) -> Unit,
-    onViewArrivals: (stationEntity: StationEntity) -> Unit,
+    onViewDepartures: (station: Station) -> Unit,
+    onViewArrivals: (station: Station) -> Unit,
 ) {
     ElevatedCard(
         modifier = modifier,
@@ -43,7 +44,7 @@ fun StationsCard(
             )
 
             var showStationSearch by remember { mutableStateOf(false) }
-            var stationEntity by remember { mutableStateOf<StationEntity?>(null) }
+            var station by remember { mutableStateOf<Station?>(null) }
 
             if (showStationSearch) {
                 SearchModalBottomSheet(
@@ -51,9 +52,9 @@ fun StationsCard(
                         showStationSearch = false
                     },
                     onStationSelected = {
-                        stationEntity = it
+                        station = it
                     },
-                    defaultStationEntity = stationEntity,
+                    defaultStation = station,
                 )
             }
 
@@ -66,7 +67,7 @@ fun StationsCard(
                 }
             }
             OutlinedTextField(
-                value = stationEntity?.longName ?: "",
+                value = station?.longName ?: "",
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
@@ -80,7 +81,7 @@ fun StationsCard(
             ) {
                 Button(
                     onClick = {
-                        val selectedStation = stationEntity
+                        val selectedStation = station
                         if (selectedStation == null) {
                             onShowSnackbar("Selecciona una estación")
                         } else {
@@ -94,7 +95,7 @@ fun StationsCard(
 
                 Button(
                     onClick = {
-                        val selectedStation = stationEntity
+                        val selectedStation = station
                         if (selectedStation == null) {
                             onShowSnackbar("Selecciona una estación")
                         } else {

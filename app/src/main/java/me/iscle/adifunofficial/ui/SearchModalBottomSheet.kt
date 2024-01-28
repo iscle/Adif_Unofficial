@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import me.iscle.adifunofficial.elcano.circulation.model.CommuterNetwork
+import me.iscle.adifunofficial.station.model.Station
 import me.iscle.adifunofficial.ui.component.FixedModalBottomSheet
 
 private const val TAG = "SearchModalBottomSheet"
@@ -43,8 +45,8 @@ private const val TAG = "SearchModalBottomSheet"
 fun SearchModalBottomSheet(
     viewModel: SearchModalBottomSheetViewModel = hiltViewModel(),
     onDismissed: () -> Unit,
-    onStationSelected: (StationEntity) -> Unit,
-    defaultStationEntity: StationEntity? = null,
+    onStationSelected: (Station) -> Unit,
+    defaultStation: Station? = null,
 ) {
     val density = LocalDensity.current
     val sheetState = remember(density) {
@@ -63,9 +65,9 @@ fun SearchModalBottomSheet(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             val scope = rememberCoroutineScope()
-            var results by remember { mutableStateOf(emptyList<StationEntity>()) }
-            var query by remember(defaultStationEntity) {
-                val defaultStationName = defaultStationEntity?.longName ?: ""
+            var results by remember { mutableStateOf(emptyList<Station>()) }
+            var query by remember(defaultStation) {
+                val defaultStationName = defaultStation?.longName ?: ""
                 mutableStateOf(TextFieldValue(defaultStationName, TextRange(defaultStationName.length, defaultStationName.length)))
             }
             LaunchedEffect(query) {
@@ -129,11 +131,9 @@ fun SearchModalBottomSheetPreview() {
     SearchModalBottomSheet(
         onDismissed = {},
         onStationSelected = {},
-        defaultStationEntity = StationEntity(
+        defaultStation = Station(
             longName = "Sant Andreu Arenal",
-            normalizedLongName = "Sant Andreu Arenal",
             shortName = "Sant Andreu Arenal",
-            normalizedShortName = "Sant Andreu Arenal",
             code = "SAA",
             location = null,
             commuterNetwork = CommuterNetwork.RODALIES_CATALUNYA,
