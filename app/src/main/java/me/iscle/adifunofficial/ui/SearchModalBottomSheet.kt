@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -35,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import me.iscle.adifunofficial.elcano.circulation.model.CommuterNetwork
-import me.iscle.adifunofficial.station.entity.StationEntity
 import me.iscle.adifunofficial.ui.component.FixedModalBottomSheet
 
 private const val TAG = "SearchModalBottomSheet"

@@ -2,7 +2,6 @@ package me.iscle.adifunofficial.station
 
 import me.iscle.adifunofficial.elcano.stations.model.RequestedStationInfoListDTO
 import me.iscle.adifunofficial.elcano.stations.model.StationInfoDTO
-import me.iscle.adifunofficial.station.entity.StationEntity
 import me.iscle.adifunofficial.util.AdifNormalizer
 
 private const val TAG = "StationMapper"

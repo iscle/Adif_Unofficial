@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import me.iscle.adifunofficial.station.entity.StationEntity
 import me.iscle.adifunofficial.ui.SearchModalBottomSheet
 
 @Composable

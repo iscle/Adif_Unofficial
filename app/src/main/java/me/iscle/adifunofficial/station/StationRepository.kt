@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import me.iscle.adifunofficial.elcano.stations.network.StationService
-import me.iscle.adifunofficial.station.entity.StationEntity
 import me.iscle.adifunofficial.util.AdifNormalizer
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.hours
