@@ -1,4 +1,4 @@
-package me.iscle.adifunofficial
+package me.iscle.adifunofficial.ui
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

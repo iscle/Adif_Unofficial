@@ -64,10 +64,11 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.2.0-rc01")
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
 
+    implementation("androidx.navigation:navigation-compose:2.7.6")
+
     implementation("com.google.dagger:hilt-android:2.49")
     kapt("com.google.dagger:hilt-android-compiler:2.49")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")

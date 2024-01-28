@@ -1,4 +1,4 @@
-package me.iscle.adifunofficial
+package me.iscle.adifunofficial.ui.component
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets

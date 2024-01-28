@@ -1,4 +1,4 @@
-package me.iscle.adifunofficial
+package me.iscle.adifunofficial.util
 
 import java.text.Normalizer
 

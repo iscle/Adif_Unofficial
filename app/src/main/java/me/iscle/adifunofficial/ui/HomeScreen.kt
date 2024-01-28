@@ -1,4 +1,4 @@
-package me.iscle.adifunofficial
+package me.iscle.adifunofficial.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +33,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import me.iscle.adifunofficial.elcano.circulation.model.TrafficType
+import me.iscle.adifunofficial.ui.component.RecentArrivalCard
+import me.iscle.adifunofficial.ui.component.RecentBetweenStationsCard
+import me.iscle.adifunofficial.ui.component.RecentDepartureCard
+import me.iscle.adifunofficial.ui.component.StationsCard
+import me.iscle.adifunofficial.ui.component.TrainBetweenStationsCard
 
 private enum class NavigationBarItems(
     val icon: ImageVector,
@@ -45,7 +51,11 @@ private enum class NavigationBarItems(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainUi() {
+fun HomeScreen(
+    navigateToDepartures: (station: String) -> Unit,
+    navigateToArrivals: (station: String) -> Unit,
+    navigateToTrainBetweenStations: (origin: String, destination: String, trafficTypes: Array<TrafficType>) -> Unit,
+) {
     val scope = rememberCoroutineScope()
     var selectedNavigationBarItem by remember { mutableStateOf(NavigationBarItems.HOME) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -98,7 +108,13 @@ fun MainUi() {
                                 snackbarHostState.showSnackbar(message)
                             }
                         }
-                    }
+                    },
+                    onViewDepartures = { station ->
+                        navigateToDepartures(station.code)
+                    },
+                    onViewArrivals = { station ->
+                        navigateToArrivals(station.code)
+                    },
                 )
             }
 
@@ -111,6 +127,10 @@ fun MainUi() {
                                 snackbarHostState.showSnackbar(message)
                             }
                         }
+                    },
+                    onSearchTrains = { origin, destination ->
+                        val trafficTypes = origin.trafficTypes.filter { it in destination.trafficTypes }.toTypedArray()
+                        navigateToTrainBetweenStations(origin.code, destination.code, trafficTypes)
                     }
                 )
             }
@@ -127,7 +147,7 @@ fun MainUi() {
                             text = "Busquedas recientes",
                             style = MaterialTheme.typography.titleLarge,
                         )
-                        
+
                         RecentArrivalCard(
                             stationName = "Madrid",
                             onClick = {},
@@ -159,5 +179,9 @@ fun MainUi() {
 @Preview
 @Composable
 fun MainUiPreview() {
-    MainUi()
+    HomeScreen(
+        navigateToDepartures = {},
+        navigateToArrivals = {},
+        navigateToTrainBetweenStations = { _, _, _ -> },
+    )
 }

@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import me.iscle.adifunofficial.station.StationRepository
+import me.iscle.adifunofficial.ui.AdifNavHost
 import me.iscle.adifunofficial.ui.theme.AdifUnofficialTheme
 import javax.inject.Inject
 
@@ -20,7 +22,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AdifUnofficialTheme {
-                MainUi()
+                val navController = rememberNavController()
+                AdifNavHost(navController = navController)
             }
         }
 

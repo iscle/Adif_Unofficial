@@ -1,4 +1,4 @@
-package me.iscle.adifunofficial
+package me.iscle.adifunofficial.ui.component
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -21,14 +21,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import me.iscle.adifunofficial.station.entity.StationEntity
+import me.iscle.adifunofficial.ui.SearchModalBottomSheet
 
 @Composable
 fun StationsCard(
     modifier: Modifier = Modifier,
-    onShowSnackbar: (String) -> Unit,
+    onShowSnackbar: (text: String) -> Unit,
+    onViewDepartures: (stationEntity: StationEntity) -> Unit,
+    onViewArrivals: (stationEntity: StationEntity) -> Unit,
 ) {
-    var showSearch by remember { mutableStateOf(false) }
-
     ElevatedCard(
         modifier = modifier,
     ) {
@@ -41,17 +43,31 @@ fun StationsCard(
                 style = MaterialTheme.typography.titleLarge,
             )
 
-            var station by remember { mutableStateOf("") }
+            var showStationSearch by remember { mutableStateOf(false) }
+            var stationEntity by remember { mutableStateOf<StationEntity?>(null) }
+
+            if (showStationSearch) {
+                SearchModalBottomSheet(
+                    onDismissed = {
+                        showStationSearch = false
+                    },
+                    onStationSelected = {
+                        stationEntity = it
+                    },
+                    defaultStationEntity = stationEntity,
+                )
+            }
+
             val sourceInteractionSource = remember { MutableInteractionSource() }
             LaunchedEffect(sourceInteractionSource) {
                 sourceInteractionSource.interactions.collect {
                     if (it is PressInteraction.Release) {
-                        showSearch = true
+                        showStationSearch = true
                     }
                 }
             }
             OutlinedTextField(
-                value = station,
+                value = stationEntity?.longName ?: "",
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
@@ -65,11 +81,12 @@ fun StationsCard(
             ) {
                 Button(
                     onClick = {
-                              if (station.isEmpty()) {
-                                  onShowSnackbar("Selecciona una estación")
-                              } else {
-                                  // TODO: Navigate to departures
-                              }
+                        val selectedStation = stationEntity
+                        if (selectedStation == null) {
+                            onShowSnackbar("Selecciona una estación")
+                        } else {
+                            onViewDepartures(selectedStation)
+                        }
                     },
                     modifier = Modifier.weight(1f),
                 ) {
@@ -78,11 +95,12 @@ fun StationsCard(
 
                 Button(
                     onClick = {
-                                if (station.isEmpty()) {
-                                    onShowSnackbar("Selecciona una estación")
-                                } else {
-                                    // TODO: Navigate to arrivals
-                                }
+                        val selectedStation = stationEntity
+                        if (selectedStation == null) {
+                            onShowSnackbar("Selecciona una estación")
+                        } else {
+                            onViewArrivals(selectedStation)
+                        }
                     },
                     modifier = Modifier.weight(1f),
                 ) {
@@ -91,14 +109,6 @@ fun StationsCard(
             }
         }
     }
-
-    if (showSearch) {
-        SearchModalBottomSheet(
-            onDismissRequest = {
-                showSearch = false
-            }
-        )
-    }
 }
 
 @Preview
@@ -106,5 +116,7 @@ fun StationsCard(
 fun StationsCardPreview() {
     StationsCard(
         onShowSnackbar = {},
+        onViewArrivals = {},
+        onViewDepartures = {},
     )
 }

@@ -1,4 +1,4 @@
-package me.iscle.adifunofficial
+package me.iscle.adifunofficial.ui.component
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -20,11 +20,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import me.iscle.adifunofficial.station.entity.StationEntity
+import me.iscle.adifunofficial.ui.SearchModalBottomSheet
 
 @Composable
 fun TrainBetweenStationsCard(
     modifier: Modifier = Modifier,
-    onShowSnackbar: (String) -> Unit,
+    onShowSnackbar: (text: String) -> Unit,
+    onSearchTrains: (origin: StationEntity, destination: StationEntity) -> Unit,
 ) {
     ElevatedCard(
         modifier = modifier,
@@ -38,17 +41,27 @@ fun TrainBetweenStationsCard(
                 style = MaterialTheme.typography.titleLarge,
             )
 
-            var origin by remember { mutableStateOf("") }
+            var showOriginStationSearch by remember { mutableStateOf(false) }
+            var originStationEntity by remember { mutableStateOf<StationEntity?>(null) }
+
+            if (showOriginStationSearch) {
+                SearchModalBottomSheet(
+                    onDismissed = { showOriginStationSearch = false },
+                    onStationSelected = { originStationEntity = it },
+                    defaultStationEntity = originStationEntity,
+                )
+            }
+
             val sourceInteractionSource = remember { MutableInteractionSource() }
             LaunchedEffect(sourceInteractionSource) {
                 sourceInteractionSource.interactions.collect {
                     if (it is PressInteraction.Release) {
-                        origin = "Origin tapped!"
+                        showOriginStationSearch = true
                     }
                 }
             }
             OutlinedTextField(
-                value = origin,
+                value = originStationEntity?.longName ?: "",
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
@@ -56,17 +69,27 @@ fun TrainBetweenStationsCard(
                 interactionSource = sourceInteractionSource,
             )
 
-            var destination by remember { mutableStateOf("") }
+            var showDestinationStationSearch by remember { mutableStateOf(false) }
+            var destinationStationEntity by remember { mutableStateOf<StationEntity?>(null) }
+
+            if (showDestinationStationSearch) {
+                SearchModalBottomSheet(
+                    onDismissed = { showDestinationStationSearch = false },
+                    onStationSelected = { destinationStationEntity = it },
+                    defaultStationEntity = destinationStationEntity,
+                )
+            }
+
             val destinationInteractionSource = remember { MutableInteractionSource() }
             LaunchedEffect(destinationInteractionSource) {
                 destinationInteractionSource.interactions.collect {
                     if (it is PressInteraction.Release) {
-                        destination = "Destination tapped!"
+                        showDestinationStationSearch = true
                     }
                 }
             }
             OutlinedTextField(
-                value = destination,
+                value = destinationStationEntity?.longName ?: "",
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
@@ -76,15 +99,17 @@ fun TrainBetweenStationsCard(
 
             Button(
                 onClick = {
-                          if (origin.isEmpty() && destination.isEmpty()) {
-                              onShowSnackbar("Selecciona una estación de origen y destino")
-                          } else if (origin.isEmpty()) {
-                              onShowSnackbar("Selecciona una estación de origen")
-                          } else if (destination.isEmpty()) {
-                              onShowSnackbar("Selecciona una estación de destino")
-                          } else {
-                              // TODO: Navigate to train between stations
-                          }
+                    val selectedOriginStation = originStationEntity
+                    val selectedDestinationStation = destinationStationEntity
+                    if (selectedOriginStation == null && selectedDestinationStation == null) {
+                        onShowSnackbar("Selecciona una estación de origen y destino")
+                    } else if (selectedOriginStation == null) {
+                        onShowSnackbar("Selecciona una estación de origen")
+                    } else if (selectedDestinationStation == null) {
+                        onShowSnackbar("Selecciona una estación de destino")
+                    } else {
+                        onSearchTrains(selectedOriginStation, selectedDestinationStation)
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -99,5 +124,6 @@ fun TrainBetweenStationsCard(
 fun TrainBetweenStationsCardPreview() {
     TrainBetweenStationsCard(
         onShowSnackbar = {},
+        onSearchTrains = { _, _ -> }
     )
 }

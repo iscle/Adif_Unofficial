@@ -12,17 +12,17 @@ data class PassthroughDetailsStepDTO(
 ) {
     data class PassthroughDetailsStepSideDTO(
         val announceState: String?,
-        val circulationState: String?,
+        val circulationState: CirculationState?,
         val ctcPlatform: String?,
-        val forecastedOrAuditedDelay: Int?,
+        val forecastedOrAuditedDelay: Long?,
         val observation: String?,
         val operatorPlatform: String?,
         val plannedPlatform: String?,
         val plannedTime: Long?,
-        val resultantPlatform: String?,
+        val resultantPlatform: ResultantPlatform?,
         val showDelay: Boolean?,
         val sitraPlatform: String?,
         val technicalCirculationKey: PassthroughStepDTO.TechnicalCirculationKeyDTO?,
-        val timeType: String?,
+        val timeType: TimeType?,
     )
 }
