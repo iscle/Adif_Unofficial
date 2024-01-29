@@ -42,7 +42,8 @@ class CirculationRepository @Inject constructor(
             )
 
             val response = circulationService.betweenStations(request)
-            val commercialPaths = response.commercialPaths
+            val body = if (response.isSuccessful) response.body() else null
+            val commercialPaths = body?.commercialPaths
             CirculationMapper.mapBetweenStations(commercialPaths)
         }
     }

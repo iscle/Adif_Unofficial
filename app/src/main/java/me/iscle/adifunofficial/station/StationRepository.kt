@@ -29,14 +29,14 @@ class StationRepository @Inject constructor(
     private val stationDao: StationDao,
 ) {
     private val dataStore = context.dataStore
+    private val cachedStations = mutableMapOf<String, Station>()
 
     suspend fun updateStations(): Boolean {
         return withContext(Dispatchers.IO) {
             Log.d(TAG, "updateStations: Starting stations update!")
 
-            var lastUpdate = 0L
-            var token = "0"
-
+            var lastUpdate: Long
+            var token: String
             dataStore.data.first().let { preferences ->
                 lastUpdate = preferences[LAST_UPDATE] ?: 0
                 token = preferences[TOKEN_KEY] ?: "0"
@@ -47,6 +47,11 @@ class StationRepository @Inject constructor(
                 try {
                     Log.d(TAG, "updateStations: Requesting new stations...")
                     val response = stationService.getStations(token)
+                    if (response == null) {
+                        Log.w(TAG, "updateStations: The server returned a null response!")
+                        return@withContext false
+                    }
+
                     if (response.token != null) {
                         dataStore.edit { preferences ->
                             preferences[TOKEN_KEY] = response.token
@@ -79,7 +84,15 @@ class StationRepository @Inject constructor(
     suspend fun getStation(
         stationCode: String,
     ): Station? {
-        return stationDao.getStation(stationCode)
+        if (cachedStations.containsKey(stationCode)) {
+            return cachedStations[stationCode]
+        }
+
+        val station = stationDao.getStation(stationCode)
+        if (station != null) {
+            cachedStations[stationCode] = station
+        }
+        return station
     }
 
     suspend fun search(

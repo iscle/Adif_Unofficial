@@ -7,7 +7,7 @@ data class Station(
     val code: String,
     val longName: String,
     val shortName: String,
-    val commuterNetwork: CommuterNetwork,
+    val commuterNetwork: CommuterNetwork?,
     val trafficTypes: List<TrafficType>,
     val location: Location?,
 ) {

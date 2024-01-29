@@ -1,13 +1,12 @@
 package me.iscle.adifunofficial.station
 
+import android.util.Log
 import me.iscle.adifunofficial.elcano.circulation.model.TrafficType
 import me.iscle.adifunofficial.elcano.stations.model.RequestedStationInfoListDTO
 import me.iscle.adifunofficial.elcano.stations.model.StationInfoDTO
 import me.iscle.adifunofficial.station.entity.LocationEntity
-import me.iscle.adifunofficial.station.entity.TrafficTypeEntity
 import me.iscle.adifunofficial.station.model.Location
 import me.iscle.adifunofficial.station.model.Station
-import me.iscle.adifunofficial.util.AdifNormalizer
 
 private const val TAG = "StationMapper"
 
@@ -22,14 +21,17 @@ object StationMapper {
     }
 
     fun mapStationInfoDtoToStation(stationInfoDto: StationInfoDTO): Station? {
+        val code = stationInfoDto.stationCode
         var longName = stationInfoDto.longName
         var shortName = stationInfoDto.shortName
-        val code = stationInfoDto.stationCode ?: return null
-        val commuterNetwork = stationInfoDto.commuterNetwork ?: return null
+        val commuterNetwork = stationInfoDto.commuterNetwork
 
         if (longName == null) longName = shortName
         if (shortName == null) shortName = longName
-        if (longName == null || shortName == null) return null
+        if (code == null || longName == null || shortName == null) {
+            Log.d(TAG, "mapStationInfoDtoToStation: Skipping station. (code=$code, longName=$longName, shortName=$shortName)")
+            return null
+        }
 
         val trafficTypes = stationInfoDto.trafficType?.mapNotNull {
             if (it == null) return@mapNotNull null

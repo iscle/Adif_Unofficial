@@ -3,10 +3,12 @@ package me.iscle.adifunofficial.ui
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -14,12 +16,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -31,18 +33,15 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import me.iscle.adifunofficial.circulation.model.BetweenStationsInfo
-import me.iscle.adifunofficial.circulation.model.RouteInfo
-import me.iscle.adifunofficial.circulation.model.StopInfo
-import me.iscle.adifunofficial.elcano.circulation.model.CirculationState
-import me.iscle.adifunofficial.elcano.circulation.model.TimeType
 import me.iscle.adifunofficial.elcano.circulation.model.TrafficType
+import me.iscle.adifunofficial.station.model.Station
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -62,7 +61,7 @@ fun TrainBetweenStationsScreen(
     var selectedTrafficType by remember(trafficTypes) { mutableStateOf(trafficTypes.firstOrNull()) }
 
     val capturedSelectedTrafficType = selectedTrafficType
-    LaunchedEffect(capturedSelectedTrafficType) {
+    LaunchedEffect(originStation, destinationStation, capturedSelectedTrafficType) {
         if (capturedSelectedTrafficType == null) return@LaunchedEffect
         Log.d(TAG, "TrainBetweenStationsScreen: Using traffic type $capturedSelectedTrafficType")
         viewModel.getTrainsBetweenStations(0, capturedSelectedTrafficType)
@@ -70,8 +69,9 @@ fun TrainBetweenStationsScreen(
 
     TrainBetweenStationsUi(
         onBack = onBack,
-        originStation = originStation.longName,
-        destinationStation = destinationStation.longName,
+        onSelectedStationsChanged = viewModel::setStations,
+        originStation = originStation,
+        destinationStation = destinationStation,
         trafficTypes = trafficTypes,
         selectedTrafficType = selectedTrafficType,
         onSelectedTrafficTypeChanged = { selectedTrafficType = it },
@@ -84,12 +84,13 @@ fun TrainBetweenStationsScreen(
 @Composable
 fun TrainBetweenStationsUi(
     onBack: () -> Unit,
-    originStation: String,
-    destinationStation: String,
+    onSelectedStationsChanged: (origin: Station, destination: Station) -> Unit,
+    originStation: Station,
+    destinationStation: Station,
     trafficTypes: List<TrafficType>,
     selectedTrafficType: TrafficType?,
     onSelectedTrafficTypeChanged: (TrafficType) -> Unit,
-    trainsBetweenStations: List<BetweenStationsInfo>,
+    trainsBetweenStations: List<BetweenStationsRowData>,
     isLoading: Boolean,
 ) {
     Scaffold(
@@ -115,19 +116,43 @@ fun TrainBetweenStationsUi(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Column(
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
                     .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = "De $originStation",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = "a $destinationStation",
-                    style = MaterialTheme.typography.titleMedium,
-                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    SearchableStationOutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        label = "Origen",
+                        selectedStation = originStation,
+                        onStationSelected = {
+                            onSelectedStationsChanged(it, destinationStation)
+                        }
+                    )
+                    SearchableStationOutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        label = "Destino",
+                        selectedStation = destinationStation,
+                        onStationSelected = {
+                            onSelectedStationsChanged(originStation, it)
+                        }
+                    )
+                }
+                IconButton(onClick = {
+                    onSelectedStationsChanged(destinationStation, originStation)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.SwapVert,
+                        contentDescription = "Swap",
+                    )
+                }
             }
 
             LazyRow(
@@ -208,12 +233,14 @@ fun TrainBetweenStationsUi(
                         }
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                            val originTimeFormatted = timeFormat.format(Date(item.originStopInfo.plannedTime))
-                            val destinationTimeFormatted = timeFormat.format(Date(item.destinationStopInfo.plannedTime))
+                            val originTimeFormatted = timeFormat.format(Date(item.originTime))
+                            val destinationTimeFormatted = timeFormat.format(Date(item.destinationTime))
 
                             Text(
                                 text = "$originTimeFormatted - $destinationTimeFormatted",
@@ -227,14 +254,14 @@ fun TrainBetweenStationsUi(
                             )
 
                             Text(
-                                text = item.routeInfo.destinationStation!!,
+                                text = item.destinationName,
                                 modifier = Modifier.weight(1f),
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1,
                             )
 
                             Text(
-                                text = item.routeInfo.line!!,
+                                text = item.line,
                                 modifier = Modifier.layout { measurable, constraints ->
                                     val placeable = measurable.measure(constraints)
                                     maxLineColumnWidth = maxOf(maxLineColumnWidth, placeable.width)
@@ -245,7 +272,7 @@ fun TrainBetweenStationsUi(
                             )
 
                             Text(
-                                text = item.originStopInfo.platform!!,
+                                text = item.originPlatform,
                                 modifier = Modifier.layout { measurable, constraints ->
                                     val placeable = measurable.measure(constraints)
                                     maxPlatformColumnWidth = maxOf(maxPlatformColumnWidth, placeable.width)
@@ -267,8 +294,29 @@ fun TrainBetweenStationsUi(
 fun TrainBetweenStationsScreenPreview() {
     TrainBetweenStationsUi(
         onBack = {},
-        originStation = "Granollers-Canovelles",
-        destinationStation = "Barcelona Plaça Catalunya",
+        onSelectedStationsChanged = { _, _ -> },
+        originStation = Station(
+            code = "123",
+            longName = "Barcelona Sants",
+            shortName = "Sants",
+            commuterNetwork = null,
+            trafficTypes = listOf(
+                TrafficType.CERCANIAS,
+                TrafficType.AVLDMD,
+            ),
+            location = null,
+        ),
+        destinationStation = Station(
+            code = "123",
+            longName = "Barcelona Plaça Catalunya",
+            shortName = "Plaça Catalunya",
+            commuterNetwork = null,
+            trafficTypes = listOf(
+                TrafficType.CERCANIAS,
+                TrafficType.AVLDMD,
+            ),
+            location = null,
+        ),
         trafficTypes = listOf(
             TrafficType.CERCANIAS,
             TrafficType.AVLDMD,
@@ -276,93 +324,26 @@ fun TrainBetweenStationsScreenPreview() {
         selectedTrafficType = TrafficType.CERCANIAS,
         onSelectedTrafficTypeChanged = {},
         trainsBetweenStations = listOf(
-            BetweenStationsInfo(
-                routeInfo = RouteInfo(
-                    originStation = null,
-                    destinationStation = "Las Vegas de San Antonio de la Florida",
-                    line = "R3",
-                    trafficType = null,
-                ),
-                originStopInfo = StopInfo(
-                    plannedTime = System.currentTimeMillis(),
-                    delay = 0L,
-                    timeType = TimeType.FORECASTED,
-                    platform = "1",
-                    circulationState = CirculationState.PENDING_TO_CIRCULATE,
-                ),
-                destinationStopInfo = StopInfo(
-                    plannedTime = System.currentTimeMillis(),
-                    delay = 0L,
-                    timeType = TimeType.FORECASTED,
-                    platform = "1",
-                    circulationState = CirculationState.PENDING_TO_CIRCULATE,
-                ),
+            BetweenStationsRowData(
+                originTime = System.currentTimeMillis(),
+                destinationTime = System.currentTimeMillis() + 1000 * 60 * 60 * 2,
+                destinationName = "Plaça Catalunya",
+                line = "R3",
+                originPlatform = "1",
             ),
-            BetweenStationsInfo(
-                routeInfo = RouteInfo(
-                    originStation = null,
-                    destinationStation = "Las Vegas",
-                    line = "R3",
-                    trafficType = null,
-                ),
-                originStopInfo = StopInfo(
-                    plannedTime = System.currentTimeMillis(),
-                    delay = 0L,
-                    timeType = TimeType.FORECASTED,
-                    platform = "1",
-                    circulationState = CirculationState.PENDING_TO_CIRCULATE,
-                ),
-                destinationStopInfo = StopInfo(
-                    plannedTime = System.currentTimeMillis(),
-                    delay = 0L,
-                    timeType = TimeType.FORECASTED,
-                    platform = "1",
-                    circulationState = CirculationState.PENDING_TO_CIRCULATE,
-                ),
+            BetweenStationsRowData(
+                originTime = System.currentTimeMillis(),
+                destinationTime = System.currentTimeMillis() + 2000 * 60 * 60 * 2,
+                destinationName = "Barcelona Sants",
+                line = "R3",
+                originPlatform = "1",
             ),
-            BetweenStationsInfo(
-                routeInfo = RouteInfo(
-                    originStation = null,
-                    destinationStation = "Las Vegas de San Antonio de la Florida",
-                    line = "R3",
-                    trafficType = null,
-                ),
-                originStopInfo = StopInfo(
-                    plannedTime = System.currentTimeMillis(),
-                    delay = 0L,
-                    timeType = TimeType.FORECASTED,
-                    platform = "1",
-                    circulationState = CirculationState.PENDING_TO_CIRCULATE,
-                ),
-                destinationStopInfo = StopInfo(
-                    plannedTime = System.currentTimeMillis(),
-                    delay = 0L,
-                    timeType = TimeType.FORECASTED,
-                    platform = "1",
-                    circulationState = CirculationState.PENDING_TO_CIRCULATE,
-                ),
-            ),
-            BetweenStationsInfo(
-                routeInfo = RouteInfo(
-                    originStation = null,
-                    destinationStation = "Las Vegas de San Antonio de la Florida",
-                    line = "R3",
-                    trafficType = null,
-                ),
-                originStopInfo = StopInfo(
-                    plannedTime = System.currentTimeMillis(),
-                    delay = 0L,
-                    timeType = TimeType.FORECASTED,
-                    platform = "1",
-                    circulationState = CirculationState.PENDING_TO_CIRCULATE,
-                ),
-                destinationStopInfo = StopInfo(
-                    plannedTime = System.currentTimeMillis(),
-                    delay = 0L,
-                    timeType = TimeType.FORECASTED,
-                    platform = "1",
-                    circulationState = CirculationState.PENDING_TO_CIRCULATE,
-                ),
+            BetweenStationsRowData(
+                originTime = System.currentTimeMillis(),
+                destinationTime = System.currentTimeMillis() + 3000 * 60 * 60 * 2,
+                destinationName = "Granollers Centre",
+                line = "R3",
+                originPlatform = "1",
             ),
         ),
         isLoading = false,

@@ -16,13 +16,13 @@ private const val HEADER_USER_KEY = "User-key: 0d021447a2fd2ac64553674d5a0c1a6f"
 interface StationService {
     @Headers(HEADER_CONTENT_TYPE, HEADER_USER_KEY)
     @POST("/portroyalmanager/secure/stations/onestation/")
-    suspend fun getStation(@Body oneStationRequest: OneStationRequest): StationResponse
+    suspend fun getStation(@Body oneStationRequest: OneStationRequest): StationResponse?
 
     @Headers(HEADER_CONTENT_TYPE, HEADER_USER_KEY)
     @GET("/portroyalmanager/secure/stations/allstations/reducedinfo/{token}/")
-    suspend fun getStations(@Path("token") token: String): StationsResponse
+    suspend fun getStations(@Path("token") token: String): StationsResponse?
 
     @Headers(HEADER_CONTENT_TYPE, HEADER_USER_KEY)
     @POST("/portroyalmanager/secure/stationsobservations/")
-    suspend fun getStationObservations(@Body stationObservationsRequest: StationObservationsRequest): StationObservationsResponse
+    suspend fun getStationObservations(@Body stationObservationsRequest: StationObservationsRequest): StationObservationsResponse?
 }

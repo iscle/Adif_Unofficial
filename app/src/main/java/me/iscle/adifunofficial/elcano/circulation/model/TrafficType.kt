@@ -8,11 +8,11 @@ enum class TrafficType {
     GOODS,
     ALL;
 
-    fun prettyName(commuterNetwork: CommuterNetwork): String {
+    fun prettyName(commuterNetwork: CommuterNetwork?): String {
         return if (this == CERCANIAS && commuterNetwork == CommuterNetwork.RODALIES_CATALUNYA) {
             "Rodalies"
         } else {
-            name.replaceFirstChar { it.uppercase() }
+            name
         }
     }
 

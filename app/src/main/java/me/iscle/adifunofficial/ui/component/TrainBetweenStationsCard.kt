@@ -1,7 +1,5 @@
 package me.iscle.adifunofficial.ui.component
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,10 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.iscle.adifunofficial.station.model.Station
-import me.iscle.adifunofficial.ui.SearchModalBottomSheet
+import me.iscle.adifunofficial.ui.SearchableStationOutlinedTextField
 
 @Composable
 fun TrainBetweenStationsCard(
@@ -41,60 +37,20 @@ fun TrainBetweenStationsCard(
                 style = MaterialTheme.typography.titleLarge,
             )
 
-            var showOriginStationSearch by remember { mutableStateOf(false) }
             var originStation by remember { mutableStateOf<Station?>(null) }
-
-            if (showOriginStationSearch) {
-                SearchModalBottomSheet(
-                    onDismissRequest = { showOriginStationSearch = false },
-                    onStationSelected = { originStation = it },
-                    defaultStation = originStation,
-                )
-            }
-
-            val sourceInteractionSource = remember { MutableInteractionSource() }
-            LaunchedEffect(sourceInteractionSource) {
-                sourceInteractionSource.interactions.collect {
-                    if (it is PressInteraction.Release) {
-                        showOriginStationSearch = true
-                    }
-                }
-            }
-            OutlinedTextField(
-                value = originStation?.longName ?: "",
-                onValueChange = {},
+            SearchableStationOutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                readOnly = true,
-                label = { Text(text = "Origen") },
-                interactionSource = sourceInteractionSource,
+                label = "Origen",
+                selectedStation = originStation,
+                onStationSelected = { originStation = it },
             )
 
-            var showDestinationStationSearch by remember { mutableStateOf(false) }
             var destinationStation by remember { mutableStateOf<Station?>(null) }
-
-            if (showDestinationStationSearch) {
-                SearchModalBottomSheet(
-                    onDismissRequest = { showDestinationStationSearch = false },
-                    onStationSelected = { destinationStation = it },
-                    defaultStation = destinationStation,
-                )
-            }
-
-            val destinationInteractionSource = remember { MutableInteractionSource() }
-            LaunchedEffect(destinationInteractionSource) {
-                destinationInteractionSource.interactions.collect {
-                    if (it is PressInteraction.Release) {
-                        showDestinationStationSearch = true
-                    }
-                }
-            }
-            OutlinedTextField(
-                value = destinationStation?.longName ?: "",
-                onValueChange = {},
+            SearchableStationOutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                readOnly = true,
-                label = { Text(text = "Destino") },
-                interactionSource = destinationInteractionSource,
+                label = "Destino",
+                selectedStation = destinationStation,
+                onStationSelected = { destinationStation = it },
             )
 
             Button(

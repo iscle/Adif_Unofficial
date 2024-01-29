@@ -1,5 +1,10 @@
 package me.iscle.adifunofficial.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,8 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
@@ -23,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -45,8 +55,8 @@ private const val TAG = "SearchModalBottomSheet"
 fun SearchModalBottomSheet(
     viewModel: SearchModalBottomSheetViewModel = hiltViewModel(),
     onDismissRequest: () -> Unit,
+    station: Station? = null,
     onStationSelected: (Station) -> Unit,
-    defaultStation: Station? = null,
 ) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
@@ -58,8 +68,8 @@ fun SearchModalBottomSheet(
     }
 
     var results by remember { mutableStateOf(emptyList<Station>()) }
-    var query by remember(defaultStation) {
-        val defaultStationName = defaultStation?.longName ?: ""
+    var query by remember(station) {
+        val defaultStationName = station?.longName ?: ""
         mutableStateOf(TextFieldValue(defaultStationName, TextRange(defaultStationName.length, defaultStationName.length)))
     }
 
@@ -113,6 +123,26 @@ private fun SearchModalBottomSheetInternal(
                     .padding(horizontal = 16.dp)
                     .focusRequester(focusRequester),
                 label = { Text(text = "Buscar") },
+                trailingIcon = {
+                    AnimatedVisibility(
+                        visible = query.text.isNotBlank(),
+                        enter = fadeIn() + expandHorizontally(
+                            expandFrom = Alignment.Start,
+                        ),
+                        exit = fadeOut() + shrinkHorizontally(
+                            shrinkTowards = Alignment.Start,
+                        ),
+                    ) {
+                        IconButton(onClick = {
+                            onQueryChange(TextFieldValue(""))
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = "Limpiar",
+                            )
+                        }
+                    }
+                },
             )
 
             LazyColumn(

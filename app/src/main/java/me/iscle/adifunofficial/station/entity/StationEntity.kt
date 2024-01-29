@@ -12,5 +12,5 @@ data class StationEntity(
     val shortName: String,
     @ColumnInfo(collate = ColumnInfo.NOCASE) val normalizedShortName: String,
     @PrimaryKey @ColumnInfo(collate = ColumnInfo.NOCASE) val code: String,
-    val commuterNetwork: CommuterNetwork,
+    val commuterNetwork: CommuterNetwork?,
 )

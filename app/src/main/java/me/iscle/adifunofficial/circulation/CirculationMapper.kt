@@ -101,8 +101,8 @@ object CirculationMapper {
             ResultantPlatform.SITRA -> passthroughStepSides.sitraPlatform
             ResultantPlatform.CTC -> passthroughStepSides.ctcPlatform
             ResultantPlatform.OPERATOR -> passthroughStepSides.operatorPlatform
+            ResultantPlatform.PLANNED,
             ResultantPlatform.RELIABLE_PLANNED -> passthroughStepSides.plannedPlatform
-            ResultantPlatform.PLANNED -> ""
             else -> null
         }.let { if (it == "*") null else it }
         val circulationState = passthroughStepSides.circulationState ?: return null
