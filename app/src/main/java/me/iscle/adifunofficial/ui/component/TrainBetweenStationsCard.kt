@@ -46,7 +46,7 @@ fun TrainBetweenStationsCard(
 
             if (showOriginStationSearch) {
                 SearchModalBottomSheet(
-                    onDismissed = { showOriginStationSearch = false },
+                    onDismissRequest = { showOriginStationSearch = false },
                     onStationSelected = { originStation = it },
                     defaultStation = originStation,
                 )
@@ -74,7 +74,7 @@ fun TrainBetweenStationsCard(
 
             if (showDestinationStationSearch) {
                 SearchModalBottomSheet(
-                    onDismissed = { showDestinationStationSearch = false },
+                    onDismissRequest = { showDestinationStationSearch = false },
                     onStationSelected = { destinationStation = it },
                     defaultStation = destinationStation,
                 )

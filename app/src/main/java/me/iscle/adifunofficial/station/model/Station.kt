@@ -10,4 +10,15 @@ data class Station(
     val commuterNetwork: CommuterNetwork,
     val trafficTypes: List<TrafficType>,
     val location: Location?,
-)
+) {
+    companion object {
+        val EMPTY_STATION = Station(
+            code = "",
+            longName = "",
+            shortName = "",
+            commuterNetwork = CommuterNetwork.UNKNOWN,
+            trafficTypes = emptyList(),
+            location = null,
+        )
+    }
+}

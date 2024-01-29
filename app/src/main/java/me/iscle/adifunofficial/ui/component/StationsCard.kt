@@ -48,7 +48,7 @@ fun StationsCard(
 
             if (showStationSearch) {
                 SearchModalBottomSheet(
-                    onDismissed = {
+                    onDismissRequest = {
                         showStationSearch = false
                     },
                     onStationSelected = {

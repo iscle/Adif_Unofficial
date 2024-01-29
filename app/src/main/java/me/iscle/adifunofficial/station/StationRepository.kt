@@ -8,13 +8,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.sqlite.db.SimpleSQLiteQuery
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import me.iscle.adifunofficial.elcano.stations.network.StationService
-import me.iscle.adifunofficial.util.AdifNormalizer
+import me.iscle.adifunofficial.station.model.Station
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.hours
 
@@ -75,6 +74,12 @@ class StationRepository @Inject constructor(
 
             true
         }
+    }
+
+    suspend fun getStation(
+        stationCode: String,
+    ): Station? {
+        return stationDao.getStation(stationCode)
     }
 
     suspend fun search(

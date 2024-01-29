@@ -18,4 +18,5 @@ enum class CommuterNetwork {
     SEVILLA,
     VALENCIA,
     ZARAGOZA,
+    UNKNOWN,
 }

@@ -7,7 +7,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import me.iscle.adifunofficial.elcano.circulation.model.TrafficType
 
 private sealed class Screen(
     val route: String,
@@ -38,7 +37,7 @@ private sealed class Screen(
     }
 
     data object TrainBetweenStations : Screen(
-        route = "trainBetweenStations/{originStation}/{destinationStation}/{trafficTypes}",
+        route = "trainBetweenStations/{originStation}/{destinationStation}",
         arguments = listOf(
             navArgument("originStation") {
                 type = NavType.StringType
@@ -46,13 +45,10 @@ private sealed class Screen(
             navArgument("destinationStation") {
                 type = NavType.StringType
             },
-            navArgument("trafficTypes") {
-                type = NavType.SerializableArrayType(TrafficType::class.java)
-            },
         ),
     ) {
-        fun createRoute(originStation: String, destinationStation: String, trafficTypes: Array<TrafficType>) =
-            "trainBetweenStations/$originStation/$destinationStation/$trafficTypes"
+        fun createRoute(originStation: String, destinationStation: String) =
+            "trainBetweenStations/$originStation/$destinationStation"
     }
 //    data object TrainDetails : Screen("trainDetails")
 //    data object StationDetails : Screen("stationDetails")
@@ -74,12 +70,11 @@ fun AdifNavHost(
                 navigateToDepartures = { station ->
                     navController.navigate(Screen.DeparturesFromStation.createRoute(station))
                 },
-                navigateToTrainBetweenStations = { origin, destination, trafficTypes ->
+                navigateToTrainBetweenStations = { origin, destination ->
                     navController.navigate(
                         Screen.TrainBetweenStations.createRoute(
                             origin,
                             destination,
-                            trafficTypes,
                         )
                     )
                 },
@@ -111,7 +106,9 @@ fun AdifNavHost(
             route = Screen.TrainBetweenStations.route,
             arguments = Screen.TrainBetweenStations.arguments,
         ) {
-            TrainBetweenStationsScreen()
+            TrainBetweenStationsScreen(
+                onBack = { navController.navigateUp() },
+            )
         }
     }
 }

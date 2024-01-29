@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.RawQuery
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -19,6 +20,15 @@ import me.iscle.adifunofficial.util.AdifNormalizer
 interface StationDao {
     @Insert
     suspend fun insert(stationEntity: StationEntity)
+
+    @Query("SELECT * FROM StationEntity WHERE code = :stationCode")
+    suspend fun getStationEntity(stationCode: String): StationEntity?
+
+    @Transaction
+    suspend fun getStation(stationCode: String): Station? {
+        val stationEntity = getStationEntity(stationCode) ?: return null
+        return mapStationEntityToStation(stationEntity)
+    }
 
     @Transaction
     @RawQuery
@@ -37,6 +47,7 @@ interface StationDao {
     suspend fun insert(stationTrafficTypeCrossRef: StationTrafficTypeCrossRef)
 
     @Query("SELECT * FROM TrafficTypeEntity INNER JOIN StationTrafficTypeCrossRef ON TrafficTypeEntity.id = StationTrafficTypeCrossRef.trafficTypeId WHERE StationTrafficTypeCrossRef.stationCode = :stationCode")
+    @RewriteQueriesToDropUnusedColumns
     suspend fun getTrafficTypesForStation(stationCode: String): List<TrafficTypeEntity>
 
     @Insert
@@ -78,6 +89,19 @@ interface StationDao {
         }
     }
 
+    suspend fun mapStationEntityToStation(stationEntity: StationEntity): Station {
+        val trafficTypes = getTrafficTypesForStation(stationEntity.code).map { it.trafficType }
+        val location = StationMapper.mapLocation(getLocationForStation(stationEntity.code))
+        return Station(
+            code = stationEntity.code,
+            longName = stationEntity.longName,
+            shortName = stationEntity.shortName,
+            commuterNetwork = stationEntity.commuterNetwork,
+            trafficTypes = trafficTypes,
+            location = location,
+        )
+    }
+
     @Transaction
     suspend fun searchStations(searchString: String): List<Station> {
         val parts = AdifNormalizer.normalize(searchString).split("\\s+".toRegex())
@@ -103,17 +127,6 @@ interface StationDao {
         val query = SimpleSQLiteQuery(queryString, finalArgs.toTypedArray())
 
         val stationEntities = queryMultipleStationEntity(query)
-        return stationEntities.map { stationEntity ->
-            val trafficTypes = getTrafficTypesForStation(stationEntity.code).map { it.trafficType }
-            val location = StationMapper.mapLocation(getLocationForStation(stationEntity.code))
-            Station(
-                code = stationEntity.code,
-                longName = stationEntity.longName,
-                shortName = stationEntity.shortName,
-                commuterNetwork = stationEntity.commuterNetwork,
-                trafficTypes = trafficTypes,
-                location = location,
-            )
-        }
+        return stationEntities.map { mapStationEntityToStation(it) }
     }
 }

@@ -10,6 +10,7 @@ data class PassthroughDetailsStepDTO(
     val stationCode: String?,
     val stopType: String?,
 ) {
+    @JsonClass(generateAdapter = true)
     data class PassthroughDetailsStepSideDTO(
         val announceState: String?,
         val circulationState: CirculationState?,

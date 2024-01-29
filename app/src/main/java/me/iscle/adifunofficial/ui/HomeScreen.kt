@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import me.iscle.adifunofficial.elcano.circulation.model.TrafficType
 import me.iscle.adifunofficial.ui.component.RecentArrivalCard
 import me.iscle.adifunofficial.ui.component.RecentBetweenStationsCard
 import me.iscle.adifunofficial.ui.component.RecentDepartureCard
@@ -54,7 +53,7 @@ private enum class NavigationBarItems(
 fun HomeScreen(
     navigateToDepartures: (station: String) -> Unit,
     navigateToArrivals: (station: String) -> Unit,
-    navigateToTrainBetweenStations: (origin: String, destination: String, trafficTypes: Array<TrafficType>) -> Unit,
+    navigateToTrainBetweenStations: (origin: String, destination: String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     var selectedNavigationBarItem by remember { mutableStateOf(NavigationBarItems.HOME) }
@@ -129,8 +128,7 @@ fun HomeScreen(
                         }
                     },
                     onSearchTrains = { origin, destination ->
-                        val trafficTypes = origin.trafficTypes.filter { it in destination.trafficTypes }.toTypedArray()
-                        navigateToTrainBetweenStations(origin.code, destination.code, trafficTypes)
+                        navigateToTrainBetweenStations(origin.code, destination.code)
                     }
                 )
             }
@@ -182,6 +180,6 @@ fun MainUiPreview() {
     HomeScreen(
         navigateToDepartures = {},
         navigateToArrivals = {},
-        navigateToTrainBetweenStations = { _, _, _ -> },
+        navigateToTrainBetweenStations = { _, _ -> },
     )
 }

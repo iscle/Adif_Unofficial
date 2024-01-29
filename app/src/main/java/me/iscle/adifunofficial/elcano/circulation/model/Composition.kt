@@ -3,6 +3,8 @@ package me.iscle.adifunofficial.elcano.circulation.model
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class CommercialRouteInfoResponse(
-    val commercialPaths: List<CommercialRouteInfoDTO?>?,
+data class Composition(
+//    val coaches: List<Coaches?>?,
+    val plannedTime: Long,
+    val stationCode: String,
 )

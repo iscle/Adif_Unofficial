@@ -43,11 +43,7 @@ class CirculationRepository @Inject constructor(
 
             val response = circulationService.betweenStations(request)
             val commercialPaths = response.commercialPaths
-            if (commercialPaths != null) {
-                CirculationMapper.mapBetweenStations(commercialPaths)
-            } else {
-                emptyList()
-            }
+            CirculationMapper.mapBetweenStations(commercialPaths)
         }
     }
 

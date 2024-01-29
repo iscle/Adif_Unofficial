@@ -6,8 +6,10 @@ import me.iscle.adifunofficial.circulation.model.RouteInfo
 import me.iscle.adifunofficial.circulation.model.StopInfo
 import me.iscle.adifunofficial.elcano.circulation.model.CommercialPathInfoDTO
 import me.iscle.adifunofficial.elcano.circulation.model.CommercialPathRouteSidesInfoDTO
+import me.iscle.adifunofficial.elcano.circulation.model.CommercialRouteInfoDTO
 import me.iscle.adifunofficial.elcano.circulation.model.PassthroughDetailsStepDTO
 import me.iscle.adifunofficial.elcano.circulation.model.ResultantPlatform
+import me.iscle.adifunofficial.elcano.circulation.model.RouteStepDTO
 
 private const val TAG = "CirculationMapper"
 
@@ -33,18 +35,20 @@ object CirculationMapper {
     }
     
     fun mapBetweenStations(
-        commercialPathRouteSidesInfoDtos: List<CommercialPathRouteSidesInfoDTO?>,
+        commercialPaths: List<CommercialRouteInfoDTO?>?,
     ): List<BetweenStationsInfo> {
-        return commercialPathRouteSidesInfoDtos.filterNotNull().mapNotNull { mapBetweenStations(it) }
+        if (commercialPaths == null) return emptyList()
+        return commercialPaths.mapNotNull { mapBetweenStations(it) }
     }
 
     fun mapBetweenStations(
-        commercialPathRouteSidesInfoDto: CommercialPathRouteSidesInfoDTO,
+        commercialPath: CommercialRouteInfoDTO?,
     ): BetweenStationsInfo? {
-        val commercialPathInfo = commercialPathRouteSidesInfoDto.commercialPathInfo ?: return null
-        val passthroughSteps = commercialPathRouteSidesInfoDto.passthroughSteps?.firstOrNull() ?: return null
-        val departurePassThroughStepSides = passthroughSteps.departurePassthroughStepSides ?: return null
-        val arrivalPassThroughStepSides = passthroughSteps.arrivalPassthroughStepSides ?: return null
+        if (commercialPath == null) return null
+        val commercialPathInfo = commercialPath.commercialPathInfo ?: return null
+        val passthroughStep = commercialPath.passthroughStep ?: return null
+        val departurePassThroughStepSides = passthroughStep.departurePassthroughStepSides ?: return null
+        val arrivalPassThroughStepSides = passthroughStep.arrivalPassthroughStepSides ?: return null
 
         val routeInfo = mapRouteInfo(commercialPathInfo) ?: return null
         val departureStopInfo = mapStopInfo(departurePassThroughStepSides) ?: return null
@@ -61,13 +65,14 @@ object CirculationMapper {
         commercialPathInfo: CommercialPathInfoDTO,
         passthroughStepSides: PassthroughDetailsStepDTO.PassthroughDetailsStepSideDTO,
     ): ArrivalDepartureInfo? {
-        val routeInfo = mapRouteInfo(commercialPathInfo) ?: return null
-        val stopInfo = mapStopInfo(passthroughStepSides) ?: return null
-
-        return ArrivalDepartureInfo(
-            routeInfo = routeInfo,
-            stopInfo = stopInfo,
-        )
+//        val routeInfo = mapRouteInfo(commercialPathInfo) ?: return null
+//        val stopInfo = mapStopInfo(passthroughStepSides) ?: return null
+//
+//        return ArrivalDepartureInfo(
+//            routeInfo = routeInfo,
+//            stopInfo = stopInfo,
+//        )
+        TODO()
     }
 
     private fun mapRouteInfo(
@@ -87,11 +92,10 @@ object CirculationMapper {
     }
 
     private fun mapStopInfo(
-        passthroughStepSides: PassthroughDetailsStepDTO.PassthroughDetailsStepSideDTO,
+        passthroughStepSides: RouteStepDTO.RouteStepSideDTO,
     ): StopInfo? {
         val plannedTime = passthroughStepSides.plannedTime ?: return null
         val delay = passthroughStepSides.forecastedOrAuditedDelay
-        val showDelay = passthroughStepSides.showDelay
         val timeType = passthroughStepSides.timeType ?: return null
         val platform = when (passthroughStepSides.resultantPlatform) {
             ResultantPlatform.SITRA -> passthroughStepSides.sitraPlatform
@@ -106,7 +110,6 @@ object CirculationMapper {
         return StopInfo(
             plannedTime = plannedTime,
             delay = delay,
-            showDelay = showDelay ?: false,
             timeType = timeType,
             platform = platform,
             circulationState = circulationState,

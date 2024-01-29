@@ -10,6 +10,7 @@ data class PassthroughStepDTO(
     val stationCode: String?,
     val stopType: String?,
 ) {
+    @JsonClass(generateAdapter = true)
     data class DeparturePassthroughStepSidesDTO(
         val announceState: String?,
         val circulationState: String?,
@@ -26,6 +27,7 @@ data class PassthroughStepDTO(
         val visualEffects: VisualEffectsDTO?,
     )
 
+    @JsonClass(generateAdapter = true)
     data class TechnicalCirculationKeyDTO(
         val technicalLaunchingDate: Long?,
         val technicalNumber: String?,
