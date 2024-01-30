@@ -1,6 +1,6 @@
 package me.iscle.adifunofficial.ui
 
-import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.SwapVert
@@ -26,11 +27,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,41 +56,35 @@ fun TrainBetweenStationsScreen(
 ) {
     val originStation = viewModel.originStation.collectAsState().value
     val destinationStation = viewModel.destinationStation.collectAsState().value
+    val trafficType = viewModel.trafficType.collectAsState().value
     val trafficTypes = viewModel.trafficTypes.collectAsState().value
     val trainsBetweenStations = viewModel.trainsBetweenStations.collectAsState().value
-
-    var selectedTrafficType by remember(trafficTypes) { mutableStateOf(trafficTypes.firstOrNull()) }
-
-    val capturedSelectedTrafficType = selectedTrafficType
-    LaunchedEffect(originStation, destinationStation, capturedSelectedTrafficType) {
-        if (capturedSelectedTrafficType == null) return@LaunchedEffect
-        Log.d(TAG, "TrainBetweenStationsScreen: Using traffic type $capturedSelectedTrafficType")
-        viewModel.getTrainsBetweenStations(0, capturedSelectedTrafficType)
-    }
 
     TrainBetweenStationsUi(
         onBack = onBack,
         onSelectedStationsChanged = viewModel::setStations,
+        onLoadMoreTrains = viewModel::loadMore,
         originStation = originStation,
         destinationStation = destinationStation,
         trafficTypes = trafficTypes,
-        selectedTrafficType = selectedTrafficType,
-        onSelectedTrafficTypeChanged = { selectedTrafficType = it },
+        trafficType = trafficType,
+        onTrafficTypeChanged = viewModel::setTrafficType,
         trainsBetweenStations = trainsBetweenStations,
         isLoading = false,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TrainBetweenStationsUi(
     onBack: () -> Unit,
     onSelectedStationsChanged: (origin: Station, destination: Station) -> Unit,
+    onLoadMoreTrains: () -> Unit,
     originStation: Station,
     destinationStation: Station,
     trafficTypes: List<TrafficType>,
-    selectedTrafficType: TrafficType?,
-    onSelectedTrafficTypeChanged: (TrafficType) -> Unit,
+    trafficType: TrafficType?,
+    onTrafficTypeChanged: (TrafficType) -> Unit,
     trainsBetweenStations: List<BetweenStationsRowData>,
     isLoading: Boolean,
 ) {
@@ -162,8 +157,8 @@ fun TrainBetweenStationsUi(
             ) {
                 items(trafficTypes) {
                     FilterChip(
-                        selected = it == selectedTrafficType,
-                        onClick = { onSelectedTrafficTypeChanged(it) },
+                        selected = it == trafficType,
+                        onClick = { onTrafficTypeChanged(it) },
                         label = { Text(text = it.name) },
                     )
                 }
@@ -218,6 +213,13 @@ fun TrainBetweenStationsUi(
                 )
             }
 
+            val columnState = rememberLazyListState()
+            SideEffect {
+                val lastItem = columnState.layoutInfo.visibleItemsInfo.lastOrNull()
+                if (lastItem != null && lastItem.index >= trainsBetweenStations.size - 5) {
+                    onLoadMoreTrains()
+                }
+            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -225,62 +227,66 @@ fun TrainBetweenStationsUi(
                 contentPadding = PaddingValues(bottom = 8.dp)
             ) {
                 itemsIndexed(trainsBetweenStations) { index, item ->
-                    Column {
-                        if (index != 0) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 8.dp),
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    key(item) {
+                        Column(
+                            modifier = Modifier.animateItemPlacement()
                         ) {
-                            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                            val originTimeFormatted = timeFormat.format(Date(item.originTime))
-                            val destinationTimeFormatted = timeFormat.format(Date(item.destinationTime))
+                            if (index != 0) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(vertical = 8.dp),
+                                )
+                            }
 
-                            Text(
-                                text = "$originTimeFormatted - $destinationTimeFormatted",
-                                modifier = Modifier.layout { measurable, constraints ->
-                                    val placeable = measurable.measure(constraints)
-                                    maxTimeColumnWidth = maxOf(maxTimeColumnWidth, placeable.width)
-                                    layout(placeable.width, placeable.height) {
-                                        placeable.placeRelative(0, 0)
-                                    }
-                                },
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                                val originTimeFormatted = timeFormat.format(Date(item.originTime))
+                                val destinationTimeFormatted = timeFormat.format(Date(item.destinationTime))
 
-                            Text(
-                                text = item.destinationName,
-                                modifier = Modifier.weight(1f),
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                            )
+                                Text(
+                                    text = "$originTimeFormatted - $destinationTimeFormatted",
+                                    modifier = Modifier.layout { measurable, constraints ->
+                                        val placeable = measurable.measure(constraints)
+                                        maxTimeColumnWidth = maxOf(maxTimeColumnWidth, placeable.width)
+                                        layout(placeable.width, placeable.height) {
+                                            placeable.placeRelative(0, 0)
+                                        }
+                                    },
+                                )
 
-                            Text(
-                                text = item.line,
-                                modifier = Modifier.layout { measurable, constraints ->
-                                    val placeable = measurable.measure(constraints)
-                                    maxLineColumnWidth = maxOf(maxLineColumnWidth, placeable.width)
-                                    layout(maxLineColumnWidth, placeable.height) {
-                                        placeable.placeRelative(0, 0)
-                                    }
-                                },
-                            )
+                                Text(
+                                    text = item.destinationName,
+                                    modifier = Modifier.weight(1f),
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                )
 
-                            Text(
-                                text = item.originPlatform,
-                                modifier = Modifier.layout { measurable, constraints ->
-                                    val placeable = measurable.measure(constraints)
-                                    maxPlatformColumnWidth = maxOf(maxPlatformColumnWidth, placeable.width)
-                                    layout(maxPlatformColumnWidth, placeable.height) {
-                                        placeable.placeRelative(0, 0)
-                                    }
-                                },
-                            )
+                                Text(
+                                    text = item.line,
+                                    modifier = Modifier.layout { measurable, constraints ->
+                                        val placeable = measurable.measure(constraints)
+                                        maxLineColumnWidth = maxOf(maxLineColumnWidth, placeable.width)
+                                        layout(maxLineColumnWidth, placeable.height) {
+                                            placeable.placeRelative(0, 0)
+                                        }
+                                    },
+                                )
+
+                                Text(
+                                    text = item.originPlatform,
+                                    modifier = Modifier.layout { measurable, constraints ->
+                                        val placeable = measurable.measure(constraints)
+                                        maxPlatformColumnWidth = maxOf(maxPlatformColumnWidth, placeable.width)
+                                        layout(maxPlatformColumnWidth, placeable.height) {
+                                            placeable.placeRelative(0, 0)
+                                        }
+                                    },
+                                )
+                            }
                         }
                     }
                 }
@@ -295,6 +301,7 @@ fun TrainBetweenStationsScreenPreview() {
     TrainBetweenStationsUi(
         onBack = {},
         onSelectedStationsChanged = { _, _ -> },
+        onLoadMoreTrains = {},
         originStation = Station(
             code = "123",
             longName = "Barcelona Sants",
@@ -321,8 +328,8 @@ fun TrainBetweenStationsScreenPreview() {
             TrafficType.CERCANIAS,
             TrafficType.AVLDMD,
         ),
-        selectedTrafficType = TrafficType.CERCANIAS,
-        onSelectedTrafficTypeChanged = {},
+        trafficType = TrafficType.CERCANIAS,
+        onTrafficTypeChanged = {},
         trainsBetweenStations = listOf(
             BetweenStationsRowData(
                 originTime = System.currentTimeMillis(),

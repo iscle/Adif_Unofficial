@@ -5,6 +5,7 @@ import me.iscle.adifunofficial.elcano.stations.model.StationObservationsRequest
 import me.iscle.adifunofficial.elcano.stations.model.StationObservationsResponse
 import me.iscle.adifunofficial.elcano.stations.model.StationResponse
 import me.iscle.adifunofficial.elcano.stations.model.StationsResponse
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
@@ -20,7 +21,7 @@ interface StationService {
 
     @Headers(HEADER_CONTENT_TYPE, HEADER_USER_KEY)
     @GET("/portroyalmanager/secure/stations/allstations/reducedinfo/{token}/")
-    suspend fun getStations(@Path("token") token: String): StationsResponse?
+    suspend fun getStations(@Path("token") token: String): Response<StationsResponse?>
 
     @Headers(HEADER_CONTENT_TYPE, HEADER_USER_KEY)
     @POST("/portroyalmanager/secure/stationsobservations/")

@@ -47,18 +47,19 @@ class StationRepository @Inject constructor(
                 try {
                     Log.d(TAG, "updateStations: Requesting new stations...")
                     val response = stationService.getStations(token)
-                    if (response == null) {
+                    val body = if (response.isSuccessful) response.body() else null
+                    if (body == null) {
                         Log.w(TAG, "updateStations: The server returned a null response!")
                         return@withContext false
                     }
 
-                    if (response.token != null) {
+                    if (body.token != null) {
                         dataStore.edit { preferences ->
-                            preferences[TOKEN_KEY] = response.token
+                            preferences[TOKEN_KEY] = body.token
                         }
                     }
 
-                    val stations = StationMapper.mapRequestedStationInfoListToStationList(response.requestedStationInfoList)
+                    val stations = StationMapper.mapRequestedStationInfoListToStationList(body.requestedStationInfoList)
                     if (stations != null) {
                         Log.d(TAG, "updateStations: Got ${stations.size} stations")
                         dataStore.edit { preferences ->

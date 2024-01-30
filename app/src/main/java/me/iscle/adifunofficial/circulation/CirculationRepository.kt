@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,6 +23,31 @@ class CirculationRepository @Inject constructor(
     private val circulationService: CirculationService,
 ) {
     private val dataStore = context.dataStore
+
+    fun getTrainsBetweenStations(
+        originStation: String,
+        destinationStation: String,
+        trafficType: TrafficType,
+    ): PagingSource<Int, BetweenStationsInfo> {
+        return object : PagingSource<Int, BetweenStationsInfo>() {
+            override fun getRefreshKey(state: PagingState<Int, BetweenStationsInfo>): Int? {
+                return state.anchorPosition?.let { anchorPosition ->
+                    val anchorPage = state.closestPageToPosition(anchorPosition)
+                    anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
+                }
+            }
+
+            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BetweenStationsInfo> {
+                val pageNumber = params.key ?: 0
+                val betweenStations = getTrainsBetweenStations(originStation, destinationStation, pageNumber, trafficType)
+                return LoadResult.Page(
+                    data = betweenStations,
+                    prevKey = if (pageNumber == 0) null else pageNumber - 1,
+                    nextKey = if (betweenStations.isEmpty()) null else pageNumber + 1,
+                )
+            }
+        }
+    }
 
     suspend fun getTrainsBetweenStations(
         originStation: String,
